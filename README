@@ -1,0 +1,7 @@
+VocalHarm aims to provide a totally felxible way to harmonize any vocal line.
+Currently only works with wav files.
+Goals:
+Choose any key or mode
+Choose any number of intervals within that key or mode to harmonize above or below
+Blend the harmony to sound natural
+
