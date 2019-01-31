@@ -10,9 +10,9 @@ import scipy.stats
 
 
 inputfile = "lick.wav"
-key = ""
-interval = "-3"
-balance = ".7"
+key = "C"
+interval = ["-4","3"]
+balance = [".7",".9"]
 
 data, fs = librosa.load(inputfile) 
 newdata = np.zeros(len(data))
@@ -89,20 +89,21 @@ def computeharm(data, sr):
   keynoteslist = keynotes.tolist()
   if note in keynoteslist:
     noteindex = keynoteslist.index(note)
-    newnote = np.take(keynotes,noteindex+(np.sign(int(interval))*(np.abs(int(interval))-1)),mode="wrap")
-    distance = chroma.index(note) - chroma.index(newnote)
     print("Onset", onset_times[i])
     print("Root", note)
-    print("Harmony", newnote)
-    distance = np.sign(int(interval))*((12 - (np.sign(int(interval))*distance)) % 12)
-    print("Interval",distance)
-    if i < len(onset_frames)-1:    
-     newdata[onset_samples[i]:onset_samples[i+1]] += librosa.effects.pitch_shift(data[onset_samples[i]:onset_samples[i+1]], fs, n_steps=distance)
-    else:
-     newdata[onset_samples[i]:] += librosa.effects.pitch_shift(data[onset_samples[i]:], fs, n_steps=distance) 
+    for j, element in enumerate(interval):
+     newnote = np.take(keynotes,noteindex+(np.sign(int(interval[j]))*(np.abs(int(interval[j]))-1)),mode="wrap")
+     distance = chroma.index(note) - chroma.index(newnote)
+     print("Harmony", newnote)
+     distance = np.sign(int(interval[j]))*((12 - (np.sign(int(interval[j]))*distance)) % 12)
+     print("Interval",distance)
+     if i < len(onset_frames)-1:    
+       newdata[onset_samples[i]:onset_samples[i+1]] += float(balance[j]) * librosa.effects.pitch_shift(data[onset_samples[i]:onset_samples[i+1]], fs, n_steps=distance)
+     else:
+       newdata[onset_samples[i]:] += float(balance[j]) * librosa.effects.pitch_shift(data[onset_samples[i]:], fs, n_steps=distance) 
 
    
-  output = data + float(balance) * newdata
+  output = data + newdata
   librosa.output.write_wav("output.wav", output, fs, norm=False)
 
 
